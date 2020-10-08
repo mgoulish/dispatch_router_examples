@@ -1,4 +1,9 @@
 
+This example assumes you have already done example 01_hello_world
+from this directory, so you already have Dispatch Router installed 
+on your system.
+
+
 1. run ./start_routers
 
 
