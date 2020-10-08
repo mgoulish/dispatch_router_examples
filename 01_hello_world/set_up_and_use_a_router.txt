@@ -1,0 +1,84 @@
+
+
+This is every step I used to get the QPID Dispatch Router
+running on a clean Linux box.
+
+This is using Fedora Linux, and Bash.
+
+Also, I am building the Dispatch Router from source here,
+so these instructions are maybe a little slanted toward developers.
+
+
+================================================
+
+
+1. Become root for the duration of this session.
+     sudo -s
+
+
+2. Install all the support packages.
+     dnf install qpid-proton-c-devel python-qpid-proton cmake make \
+                 gcc python-devel cyrus-sasl-plain cyrus-sasl-devel
+
+
+3. I did not have modern Python, so I had to get that too.
+     dnf install python37
+
+
+4. Get the latest Dispatch software.
+     git clone https://gitbox.apache.org/repos/asf/qpid-dispatch.git
+
+
+5. Build and install the software.
+   Because I have root privileges and I am doing a vanilla install,
+   all the executables and other et ceteras will go to all the standard
+   'official' locations. It is possible to change that, for example if
+   you want to have multiple different versions living on your box at
+   one time. 
+
+     cd ./qpid-dispatch
+     mkdir ./build
+     cd ./build
+     cmake ..
+     make -j8 install
+   # That -j flag is for using all your processors so it goes faster.
+   # It's -jN where N is how many processors you have.
+
+
+6. qdrouterd should now be installed in /usr/local/sbin and we can 
+   start it up like this:
+     qdrouterd
+   # The router should now be running in this window.
+
+
+7. Now open a new window, and it it start a Python receiver:
+     RECV=/usr/local/share/proton-0.30.0/examples/python/simple_recv.py
+     python ${RECV}  -a 127.0.0.1:5672/examples -m 5
+   # No feedback, it just sits there. 
+   # But receiver is now running in this window.
+   # That '-a' flag tells it what address to receive from.
+
+
+8. Open another new window, and run a Python sender.
+     SEND=/usr/local/share/proton-0.30.0/examples/python/simple_send.py
+     python ${SEND} -a 127.0.0.1:5672/examples -m 5
+
+
+   Now you should see output in the receiver window:
+
+             {'sequence': 1}
+             {'sequence': 2}
+             {'sequence': 3}
+             {'sequence': 4}
+             {'sequence': 5}
+
+
+   And in the sender window:
+
+             all messages confirmed
+
+   # Hello, World!
+
+
+
+
