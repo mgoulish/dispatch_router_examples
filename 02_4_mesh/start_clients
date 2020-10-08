@@ -1,0 +1,44 @@
+#! /bin/bash
+
+RECV=/usr/local/share/proton-0.30.0/examples/python/simple_recv.py
+SEND=/usr/local/share/proton-0.30.0/examples/python/simple_send.py
+
+ROUTER_A=5672
+ROUTER_B=5673
+ROUTER_C=5674
+ROUTER_D=5675
+
+# Look at the router configuration files. Any address that starts 
+# with the prefix 'multicast' is defined to be a ... wait for it ... 
+# *multicast* address! See what I did there?
+BROADCAST=multicast/auth
+
+# We place one receiver on each of the 4 routers, all listening 
+# to the BROADCAST ADDRESS.
+echo "Starting receivers..."
+python ${RECV}  -a 127.0.0.1:${ROUTER_A}/${BROADCAST} -m 10 &
+python ${RECV}  -a 127.0.0.1:${ROUTER_B}/${BROADCAST} -m 10 &
+python ${RECV}  -a 127.0.0.1:${ROUTER_C}/${BROADCAST} -m 10 &
+python ${RECV}  -a 127.0.0.1:${ROUTER_D}/${BROADCAST} -m 10 &
+
+sleep 3
+
+# The sender is only sending to this address on Router A, but
+# the router network knows where all consumers are for this 
+# address, and ensures that each message is delivered to every
+# consumer.
+echo "Starting sender..."
+python ${SEND}  -a 127.0.0.1:${ROUTER_A}/${BROADCAST} -m 10 &
+
+
+# If we had not set up this multicast address, the default would 
+# have been 'anycast', which means that the messages of the sender 
+# woulkd have been split up amongst the various receivers of the
+# address.
+
+# Note that the sender and the receivers have no knowledge of each 
+# other. None of the clients know anything except 
+#  1. how to connect to their local router.
+#  2. what address they want to send to or receive from.
+
+

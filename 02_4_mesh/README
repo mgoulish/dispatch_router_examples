@@ -1,0 +1,12 @@
+
+1. run ./start_routers
+
+
+2. run ./start_clients 
+
+
+3. You should probably kill all the routers afterward,
+   so there won't be a conflict if you run this again later.
+
+
+

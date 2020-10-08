@@ -1,0 +1,21 @@
+#! /bin/bash
+  
+ROUTER=qdrouterd
+
+# Start 4 routers, A, B, C, and D. 
+# The 4 config files tell them how to connect to each other,
+# forming whatever topology we want.
+# In this case, I have chosen a 4-mesh (i.e. a completely connected graph).
+
+${ROUTER} --config ./A.conf &
+${ROUTER} --config ./B.conf &
+${ROUTER} --config ./C.conf &
+${ROUTER} --config ./D.conf &
+
+echo "routers running:"
+ps -aef | grep qdrouterd
+echo " "
+echo " "
+echo " "
+
+
